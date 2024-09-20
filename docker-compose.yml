@@ -1,0 +1,79 @@
+version: "3.8"
+services:
+    postgres:
+        image: postgres:16
+        environment:
+            POSTGRES_USER: myuser
+            POSTGRES_PASSWORD: mypassword
+            POSTGRES_DB: mydatabase
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+            - ./initdb/init.sql:/docker-entrypoint-initdb.d/1-schema.sql
+        ports:
+            - "5432:5432"
+        restart: unless-stopped
+
+    user-service:
+        build:
+            context: ./user
+            dockerfile: Dockerfile
+        container_name: user-service
+        ports:
+            - "3000:3000"
+        environment:
+            DATABASE_HOST: postgres
+            DATABASE_PORT: 5432
+            DATABASE_USER: user_service_user
+            DATABASE_PASSWORD: user_service_password
+            DATABASE_NAME: userdb
+        depends_on:
+            - postgres
+        restart: unless-stopped
+
+    product-service:
+        build:
+            context: ./products
+            dockerfile: Dockerfile
+        container_name: product-service
+        ports:
+            - "3200:3200"
+        environment:
+            DATABASE_HOST: postgres
+            DATABASE_PORT: 5432
+            DATABASE_USER: product_service_user
+            DATABASE_PASSWORD: product_service_password
+            DATABASE_NAME: productdb
+        depends_on:
+            - postgres
+        restart: unless-stopped
+
+    order-service:
+        build:
+            context: ./orders
+            dockerfile: Dockerfile
+        container_name: order-service
+        ports:
+            - "3100:3100"
+        environment:
+            DATABASE_HOST: postgres
+            DATABASE_PORT: 5432
+            DATABASE_USER: order_service_user
+            DATABASE_PASSWORD: order_service_password
+            DATABASE_NAME: orderdb
+        depends_on:
+            - postgres
+        restart: unless-stopped
+
+    nginx:
+        image: nginx:latest
+        container_name: nginx
+        ports:
+            - "80:80"
+        volumes:
+            - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+        depends_on:
+            - order-service
+        restart: unless-stopped
+
+volumes:
+    postgres_data:
