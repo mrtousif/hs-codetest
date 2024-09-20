@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { randomUUID } from 'crypto';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { Orders } from './order.entity';
 
@@ -13,7 +14,7 @@ export class OrdersService {
 
   create(createOrderDto: CreateOrderDto): Promise<Orders> {
     const orders = new Orders();
-    orders.orderID = 'fnknkvvdv';
+    orders.orderID = randomUUID();
     orders.isCancelled = createOrderDto.isCancelled;
 
     return this.ordersRepository.save(orders);
