@@ -1,11 +1,21 @@
+## Prerequisite
+
+- Docker Desktop / Podman Desktop
+
 ## Start up the servers
 
 ```sh
 docker compose up
 ```
 
-Database: Postgres 16
-Reverse proxy: Nginx
+To rebuild the server and and startup
+
+```sh
+docker compose up --build
+```
+
+- Database: Postgres 16
+- Reverse proxy: Nginx
 
 ## Order service
 
